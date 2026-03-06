@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0626944f5884fd499ea285dedbe8ff0, type: 3}
+  m_Name: Create
+  m_EditorClassIdentifier: Assembly-CSharp::CraftingRule
+  baseItem: {fileID: 11400000, guid: 6ae2041b324b09345a654a91ff58f629, type: 2}
+  secondaryItem: {fileID: 11400000, guid: a3bfb5cac3502b344b7973cc813958e2, type: 2}
+  resultItem: {fileID: 11400000, guid: fb4efb0dfabaf1f469c1f0e91b065316, type: 2}
