@@ -1,8 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// 管理库存拖拽操作的单例管理器
+/// 处理物品拖拽、放置、交换和合成等操作
+/// </summary>
 public class InventoryDragManager : MonoBehaviour
 {
+    /// <summary>
+    /// 获取当前实例
+    /// </summary>
     public static InventoryDragManager Instance { get; private set; }
 
     [Header("Settings")]
@@ -20,16 +27,23 @@ public class InventoryDragManager : MonoBehaviour
 
     private InventorySlot[] slots;
     
+    /// <summary>
+    /// 初始化单例实例并设置相机和槽位数组
+    /// </summary>
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
         if (mainCamera == null) mainCamera = Camera.main;
         
+        // 查找所有库存槽位并按名称排序
         slots = FindObjectsOfType<InventorySlot>();
         System.Array.Sort(slots, (a, b) => string.Compare(a.name, b.name));
     }
 
+    /// <summary>
+    /// 更新拖拽状态，检查拾取或处理拖拽操作
+    /// </summary>
     private void Update()
     {
         if (!_isDragging)
@@ -45,6 +59,9 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 使用射线检测检查鼠标悬停的槽位
+    /// </summary>
     private void CheckSlotWithRaycast()
     {
         if (_draggedObject == null) return;
@@ -73,6 +90,9 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 检查鼠标点击以开始拖拽操作
+    /// </summary>
     private void CheckPickup()
     {
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
@@ -89,12 +109,22 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 检查碰撞体是否为可拖拽物品
+    /// </summary>
+    /// <param name="col">要检查的碰撞体</param>
+    /// <returns>如果为可拖拽物品则返回true</returns>
     private bool IsDraggableItem(Collider col)
     {
         return col.CompareTag("DraggableItem") ||
                (col.transform.parent != null && col.transform.parent.CompareTag("DraggableItem"));
     }
 
+    /// <summary>
+    /// 获取可拖拽对象的根游戏对象
+    /// </summary>
+    /// <param name="obj">起始游戏对象</param>
+    /// <returns>根可拖拽对象</returns>
     private GameObject GetRootDraggableObject(GameObject obj)
     {
         Transform t = obj.transform;
@@ -107,6 +137,10 @@ public class InventoryDragManager : MonoBehaviour
         return obj;
     }
 
+    /// <summary>
+    /// 开始拖拽指定的游戏对象
+    /// </summary>
+    /// <param name="obj">要拖拽的对象</param>
     private void StartDrag(GameObject obj)
     {
         _isDragging = true;
@@ -137,6 +171,9 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 处理拖拽过程中的对象位置更新
+    /// </summary>
     private void HandleDragging()
     {
         if (_draggedObject == null) return;
@@ -151,6 +188,9 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 处理拖拽对象的旋转操作
+    /// </summary>
     private void HandleRotation()
     {
         if (Keyboard.current.rKey.wasPressedThisFrame && _draggedObject != null)
@@ -159,6 +199,9 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 检查鼠标释放以执行放置操作
+    /// </summary>
     private void CheckDrop()
     {
         if (Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame)
@@ -167,6 +210,9 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 执行放置操作，处理物品移动、交换或返回原位
+    /// </summary>
     private void PerformDrop()
     {
         _isDragging = false;
@@ -209,6 +255,10 @@ public class InventoryDragManager : MonoBehaviour
         _draggedItemData = null;
     }
 
+    /// <summary>
+    /// 将拖拽的物品移动到目标槽位
+    /// </summary>
+    /// <param name="targetSlot">目标槽位</param>
     private void MoveItemToSlot(InventorySlot targetSlot)
     {
         ItemData item = _draggedItemData;
@@ -235,6 +285,12 @@ public class InventoryDragManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// 检查指定区域是否可用（无其他物品占用）
+    /// </summary>
+    /// <param name="startIdx">起始索引</param>
+    /// <param name="size">需要的空间大小</param>
+    /// <returns>如果区域可用则返回true</returns>
     private bool IsAreaAvailable(int startIdx, Vector2Int size)
     {
         for(int dx=0; dx<size.x; dx++)
@@ -246,6 +302,11 @@ public class InventoryDragManager : MonoBehaviour
         return true;
     }
     
+    /// <summary>
+    /// 获取指定槽位在数组中的索引
+    /// </summary>
+    /// <param name="slot">要查找的槽位</param>
+    /// <returns>槽位索引，未找到返回-1</returns>
     private int GetSlotIndex(InventorySlot slot)
     {
         for(int i=0; i<slots.Length; i++)
@@ -253,17 +314,31 @@ public class InventoryDragManager : MonoBehaviour
         return -1;
     }
 
+    /// <summary>
+    /// 根据索引获取槽位
+    /// </summary>
+    /// <param name="idx">槽位索引</param>
+    /// <returns>对应的槽位，无效索引返回null</returns>
     private InventorySlot GetSlotByIndex(int idx)
     {
         if(slots==null || idx<0 || idx>=slots.Length) return null;
         return slots[idx];
     }
 
+    /// <summary>
+    /// 将物品返回到原始槽位
+    /// </summary>
+    /// <param name="originalSlot">原始槽位</param>
     private void ReturnToSlot(InventorySlot originalSlot)
     {
         SnapToSlot(_draggedObject, originalSlot);
     }
 
+    /// <summary>
+    /// 将对象吸附到指定槽位
+    /// </summary>
+    /// <param name="obj">要吸附的对象</param>
+    /// <param name="slot">目标槽位</param>
     private void SnapToSlot(GameObject obj, InventorySlot slot)
     {
         obj.transform.SetParent(slot.transform);
@@ -271,6 +346,10 @@ public class InventoryDragManager : MonoBehaviour
         obj.transform.localRotation = Quaternion.identity;
     }
 
+    /// <summary>
+    /// 在两个槽位之间交换物品
+    /// </summary>
+    /// <param name="targetSlot">目标槽位</param>
     private void SwapItems(InventorySlot targetSlot)
     {
         ItemData dataA = _draggedItemData;
@@ -298,6 +377,11 @@ public class InventoryDragManager : MonoBehaviour
         SnapToSlot(objA, targetSlot);
     }
 
+    /// <summary>
+    /// 尝试在目标槽位进行合成操作
+    /// </summary>
+    /// <param name="targetSlot">目标槽位</param>
+    /// <returns>如果合成功则返回true</returns>
     private bool TryCrafting(InventorySlot targetSlot)
     {
         ItemData itemA = _draggedItemData;
